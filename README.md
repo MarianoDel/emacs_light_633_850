@@ -1,7 +1,6 @@
-# Panel de Alarma Vapore
+# LED Light Treatment Control Board
 micro STM32F030K6T6
-Teclado + Teclado remoto (con control 12 botones)
-Teclado con clave de bloqueo
+LED 6 Channels, FAN 3 Channels
 
 Antes de empezar revisar seleccion del micro y configuracion
 ------------------------------------------------------------
