@@ -1,12 +1,12 @@
-//---------------------------------------------
-// #### PROYECTO LIPO LASER - Custom Board ####
+//--------------------------------------------------
+// #### PROYECTO LIGHT TREATMENT - Custom Board ####
 // ##
 // ## @Author: Med
 // ## @Editor: Emacs - ggtags
 // ## @TAGS:   Global
 // ##
-// #### SIGNALS.C #############################
-//---------------------------------------------
+// #### SIGNALS.C ##################################
+//--------------------------------------------------
 
 /* Includes ------------------------------------------------------------------*/
 #include "signals.h"
@@ -41,32 +41,9 @@ modulated_state_t modulated_state = INIT_MODULATED;
 unsigned char modulated_index;
 
 unsigned char global_error = 0;
-//valores globales para los 4 PIDs
-short d_ch1;
-short d_ch2;
-short d_ch3;
-short d_ch4;
 
-short e_z1_ch1;
-short e_z1_ch2;
-short e_z1_ch3;
-short e_z1_ch4;
-
-short e_z2_ch1;
-short e_z2_ch2;
-short e_z2_ch3;
-short e_z2_ch4;
-
-unsigned char undersampling;
-unsigned short mod_SP_ch1;
-unsigned short mod_SP_ch2;
-unsigned short mod_SP_ch3;
-unsigned short mod_SP_ch4;
 
 //-- para determinacion de soft overcurrent ------------
-unsigned short soft_overcurrent_max_current_in_cycles [SIZEOF_OVERCURRENT_BUFF];
-unsigned short soft_overcurrent_treshold = 0;
-unsigned short soft_overcurrent_index = 0;
 
 
 //Signals Templates
@@ -103,15 +80,12 @@ void TreatmentManager (void)
     switch (treatment_state)
     {
         case TREATMENT_INIT_FIRST_TIME:
-            UpdateLaserCh1(0);
-            UpdateLaserCh2(0);
-            UpdateLaserCh3(0);
-            UpdateLaserCh4(0);
-
-            Update_TIM3_CH1(0);
-            Update_TIM3_CH2(0);
-            Update_TIM3_CH3(0);
-            Update_TIM3_CH4(0);
+            CTRL_CH1(0);
+            CTRL_CH2(0);
+            CTRL_CH3(0);
+            CTRL_CH4(0);
+            CTRL_CH5(0);
+            CTRL_CH6(0);
 
             if (AssertTreatmentParams() == resp_ok)
             {
@@ -126,14 +100,6 @@ void TreatmentManager (void)
         case TREATMENT_START_TO_GENERATE:    //reviso una vez mas los parametros y no tener ningun error
             if ((AssertTreatmentParams() == resp_ok) && (GetErrorStatus() == ERROR_OK))
             {
-#ifdef USE_SOFT_OVERCURRENT
-                //cargo valor maximo de corriente para el soft_overcurrent
-                soft_overcurrent_treshold = 1.2 * I_MAX;
-                soft_overcurrent_index = 0;
-
-                for (unsigned char i = 0; i < SIZEOF_OVERCURRENT_BUFF; i++)
-                    soft_overcurrent_max_current_in_cycles[i] = 0;
-#endif
                 if (signal_to_gen.signal == CWAVE_SIGNAL)
                 {
                     cwave_state = INIT_CWAVE;
@@ -167,16 +133,6 @@ void TreatmentManager (void)
             //se la puede llamar las veces que sea necesario y entre funciones, para acelerar
             //la respuesta
             GenerateSignalCWave();
-
-#ifdef USE_SOFT_OVERCURRENT
-            //TODO: poner algun synchro con muestras para que no ejecute el filtro todo el tiempo
-            //soft current overload check
-            // if (MAFilter8 (soft_overcurrent_max_current_in_cycles) > soft_overcurrent_treshold)
-            // {
-            //     treatment_state = TREATMENT_STOPPING;
-            //     SetErrorStatus(ERROR_SOFT_OVERCURRENT);
-            // }
-#endif
             break;
 
         case TREATMENT_GENERATING_PULSED:
@@ -184,16 +140,6 @@ void TreatmentManager (void)
             //se la puede llamar las veces que sea necesario y entre funciones, para acelerar
             //la respuesta
             GenerateSignalPulsed();
-
-#ifdef USE_SOFT_OVERCURRENT
-            //TODO: poner algun synchro con muestras para que no ejecute el filtro todo el tiempo
-            //soft current overload check
-            // if (MAFilter8 (soft_overcurrent_max_current_in_cycles) > soft_overcurrent_treshold)
-            // {
-            //     treatment_state = TREATMENT_STOPPING;
-            //     SetErrorStatus(ERROR_SOFT_OVERCURRENT);
-            // }
-#endif
             break;
 
         case TREATMENT_GENERATING_MODULATED:
@@ -201,29 +147,16 @@ void TreatmentManager (void)
             //se la puede llamar las veces que sea necesario y entre funciones, para acelerar
             //la respuesta
             GenerateSignalModulated();
-
-#ifdef USE_SOFT_OVERCURRENT
-            //TODO: poner algun synchro con muestras para que no ejecute el filtro todo el tiempo
-            //soft current overload check
-            // if (MAFilter8 (soft_overcurrent_max_current_in_cycles) > soft_overcurrent_treshold)
-            // {
-            //     treatment_state = TREATMENT_STOPPING;
-            //     SetErrorStatus(ERROR_SOFT_OVERCURRENT);
-            // }
-#endif
             break;
             
         case TREATMENT_STOPPING:
-            Update_TIM3_CH1(0);
-            Update_TIM3_CH2(0);
-            Update_TIM3_CH3(0);
-            Update_TIM3_CH4(0);
+            CTRL_CH1(0);
+            CTRL_CH2(0);
+            CTRL_CH3(0);
+            CTRL_CH4(0);
+            CTRL_CH5(0);
+            CTRL_CH6(0);
 
-            UpdateLaserCh1(0);
-            UpdateLaserCh2(0);
-            UpdateLaserCh3(0);
-            UpdateLaserCh4(0);
-            
             timer_signals = 10;
             treatment_state = TREATMENT_STOPPING2;
             break;
@@ -318,55 +251,37 @@ resp_t SetFrequency (unsigned char a)
     return resp_ok;
 }
 
-resp_t SetPowerLed (unsigned char ch, unsigned char a)
+resp_t SetPower (unsigned char ch, unsigned char a)
 {
     if (ch == 0x0F)
     {              
-        signal_to_gen.ch1_power_led = a;
-        signal_to_gen.ch2_power_led = a;
-        signal_to_gen.ch3_power_led = a;
-        signal_to_gen.ch4_power_led = a;
+        signal_to_gen.ch1_power = a;
+        signal_to_gen.ch2_power = a;
+        signal_to_gen.ch3_power = a;
+        signal_to_gen.ch4_power = a;
+        signal_to_gen.ch5_power = a;
+        signal_to_gen.ch6_power = a;
     }
     else
     {
         if (ch == 1)
-            signal_to_gen.ch1_power_led = a;
+            signal_to_gen.ch1_power = a;
 
         if (ch == 2)
-            signal_to_gen.ch2_power_led = a;
+            signal_to_gen.ch2_power = a;
 
         if (ch == 3)
-            signal_to_gen.ch3_power_led = a;
+            signal_to_gen.ch3_power = a;
 
         if (ch == 4)
-            signal_to_gen.ch4_power_led = a;
-    }
-    
-    return resp_ok;
-}
+            signal_to_gen.ch4_power = a;
 
-resp_t SetPowerLaser (unsigned char ch, unsigned char a)
-{
-    if (ch == 0x0F)
-    {              
-        signal_to_gen.ch1_power_laser = a;
-        signal_to_gen.ch2_power_laser = a;
-        signal_to_gen.ch3_power_laser = a;
-        signal_to_gen.ch4_power_laser = a;
-    }
-    else
-    {
-        if (ch == 1)
-            signal_to_gen.ch1_power_laser = a;
+        if (ch == 5)
+            signal_to_gen.ch4_power = a;
 
-        if (ch == 2)
-            signal_to_gen.ch2_power_laser = a;
+        if (ch == 6)
+            signal_to_gen.ch4_power = a;
 
-        if (ch == 3)
-            signal_to_gen.ch3_power_laser = a;
-
-        if (ch == 4)
-            signal_to_gen.ch4_power_laser = a;
     }
 
     return resp_ok;
@@ -395,19 +310,14 @@ void SendAllConf (void)
     Usart1Send(b);
     sprintf(b, "freq: %d\n", signal_to_gen.frequency);
     Usart1Send(b);
-    sprintf(b, "ch power led: %d, %d, %d, %d\n",
-            signal_to_gen.ch1_power_led,
-            signal_to_gen.ch2_power_led,
-            signal_to_gen.ch3_power_led,
-            signal_to_gen.ch4_power_led);
+    sprintf(b, "ch power led: %d, %d, %d, %d, %d, %d\n",
+            signal_to_gen.ch1_power,
+            signal_to_gen.ch2_power,
+            signal_to_gen.ch3_power,
+            signal_to_gen.ch4_power,
+            signal_to_gen.ch5_power,
+            signal_to_gen.ch6_power);
     
-    Usart1Send(b);
-    sprintf(b, "ch power laser: %d, %d, %d, %d\n",
-            signal_to_gen.ch1_power_laser,
-            signal_to_gen.ch2_power_laser,
-            signal_to_gen.ch3_power_laser,
-            signal_to_gen.ch4_power_laser);
-
     Usart1Send(b);
     Usart1Send("\n");
 }
@@ -421,33 +331,17 @@ void GenerateSignalCWave (void)
     {
         case INIT_CWAVE:
 
-            undersampling = UNDERSAMPLING_TICKS;    //para que arranque pid
-            d_ch1 = 0;
-            e_z1_ch1 = 0;
-            e_z2_ch1 = 0;
-
-            d_ch2 = 0;
-            e_z1_ch2 = 0;
-            e_z2_ch2 = 0;
-
-            d_ch3 = 0;
-            e_z1_ch3 = 0;
-            e_z2_ch3 = 0;
-
-            d_ch4 = 0;
-            e_z1_ch4 = 0;
-            e_z2_ch4 = 0;
-
             cwave_state = UPDATE_POWER_CWAVE;
             break;
 
         case UPDATE_POWER_CWAVE:
-            //la potencia de los leds entra sola en el loop
-            //la de los lasers hago aca el update
-            UpdateLaserCh1(signal_to_gen.ch1_power_laser);
-            UpdateLaserCh2(signal_to_gen.ch2_power_laser);
-            UpdateLaserCh3(signal_to_gen.ch3_power_laser);
-            UpdateLaserCh4(signal_to_gen.ch4_power_laser);
+            //hago el update de la potencia cada 1 segundo
+            CTRL_CH1(signal_to_gen.ch1_power);
+            CTRL_CH2(signal_to_gen.ch2_power);
+            CTRL_CH3(signal_to_gen.ch3_power);
+            CTRL_CH4(signal_to_gen.ch4_power);
+            CTRL_CH5(signal_to_gen.ch4_power);
+            CTRL_CH6(signal_to_gen.ch4_power);
 
             cwave_state = GEN_CWAVE;
             timer_signals_gen = 1000;    //cada 1 seg reviso potencias de los lasers            
@@ -458,95 +352,6 @@ void GenerateSignalCWave (void)
             if (!timer_signals_gen)
                 cwave_state = UPDATE_POWER_CWAVE;
 
-            //secuencia de leds
-            if (sequence_ready)
-            {
-                sequence_ready_reset;
-                if (undersampling < UNDERSAMPLING_TICKS)
-                    undersampling++;
-                else
-                {
-                    //PID CH1
-                    if (signal_to_gen.ch1_power_led >= I_MIN)
-                    {                        
-                        dummy = signal_to_gen.ch1_power_led * I_MAX;
-                        dummy >>= 8;
-                        d_ch1 = PID_roof (dummy, I_Sense_Ch1, d_ch1, &e_z1_ch1, &e_z2_ch1);
-                    }
-                    else
-                        d_ch1 = 0;
-
-                    if (d_ch1 < 0)
-                        d_ch1 = 0;
-                    else
-                    {
-                        if (d_ch1 > DUTY_70_PERCENT)
-                            d_ch1 = DUTY_70_PERCENT;
-
-                        Update_TIM3_CH1(d_ch1);
-                    }
-
-                    //PID CH2
-                    if (signal_to_gen.ch2_power_led >= I_MIN)
-                    {                        
-                        dummy = signal_to_gen.ch2_power_led * I_MAX;
-                        dummy >>= 8;
-                        d_ch2 = PID_roof (dummy, I_Sense_Ch2, d_ch2, &e_z1_ch2, &e_z2_ch2);
-                    }
-                    else
-                        d_ch2 = 0;
-
-                    if (d_ch2 < 0)
-                        d_ch2 = 0;
-                    else
-                    {
-                        if (d_ch2 > DUTY_70_PERCENT)
-                            d_ch2 = DUTY_70_PERCENT;
-
-                        Update_TIM3_CH2(d_ch2);
-                    }
-
-                    //PID CH3
-                    if (signal_to_gen.ch3_power_led >= I_MIN)
-                    {                                            
-                        dummy = signal_to_gen.ch3_power_led * I_MAX;
-                        dummy >>= 8;
-                        d_ch3 = PID_roof (dummy, I_Sense_Ch3, d_ch3, &e_z1_ch3, &e_z2_ch3);
-                    }
-                    else
-                        d_ch3 = 0;
-
-                    if (d_ch3 < 0)
-                        d_ch3 = 0;
-                    else
-                    {
-                        if (d_ch3 > DUTY_70_PERCENT)
-                            d_ch3 = DUTY_70_PERCENT;
-
-                        Update_TIM3_CH3(d_ch3);
-                    }
-
-                    //PID CH4
-                    if (signal_to_gen.ch4_power_led >= I_MIN)
-                    {                        
-                        dummy = signal_to_gen.ch4_power_led * I_MAX;
-                        dummy >>= 8;
-                        d_ch4 = PID_roof (dummy, I_Sense_Ch4, d_ch4, &e_z1_ch4, &e_z2_ch4);
-                    }
-                    else
-                        d_ch4 = 0;
-
-                    if (d_ch4 < 0)
-                        d_ch4 = 0;
-                    else
-                    {
-                        if (d_ch4 > DUTY_70_PERCENT)
-                            d_ch4 = DUTY_70_PERCENT;
-
-                        Update_TIM3_CH4(d_ch4);
-                    }
-                }    //end undersampling
-            }    //end sequence ready
             break;
 
         default:
@@ -566,31 +371,13 @@ void GenerateSignalPulsed (void)
     switch (pulsed_state)
     {
         case INIT_PULSED:
-            //por ahora solo laser
-            UpdateLaserCh1(signal_to_gen.ch1_power_laser);
 
-            UpdateLaserCh2(signal_to_gen.ch2_power_laser);
-
-            UpdateLaserCh3(signal_to_gen.ch3_power_laser);
-
-            UpdateLaserCh4(signal_to_gen.ch4_power_laser);
-
-            undersampling = UNDERSAMPLING_TICKS;    //para que arranque pid
-            d_ch1 = 0;
-            e_z1_ch1 = 0;
-            e_z2_ch1 = 0;
-
-            d_ch2 = 0;
-            e_z1_ch2 = 0;
-            e_z2_ch2 = 0;
-
-            d_ch3 = 0;
-            e_z1_ch3 = 0;
-            e_z2_ch3 = 0;
-
-            d_ch4 = 0;
-            e_z1_ch4 = 0;
-            e_z2_ch4 = 0;
+            CTRL_CH1(signal_to_gen.ch1_power);
+            CTRL_CH2(signal_to_gen.ch2_power);
+            CTRL_CH3(signal_to_gen.ch3_power);
+            CTRL_CH4(signal_to_gen.ch4_power);
+            CTRL_CH5(signal_to_gen.ch4_power);
+            CTRL_CH6(signal_to_gen.ch4_power);
             
             if (signal_to_gen.frequency == 0)
                 timer_signals_gen = 50;
@@ -603,15 +390,12 @@ void GenerateSignalPulsed (void)
         case GEN_PULSED:
             if (!timer_signals_gen)
             {
-                UpdateLaserCh1(0);
-                UpdateLaserCh2(0);
-                UpdateLaserCh3(0);
-                UpdateLaserCh4(0);
-
-                Update_TIM3_CH1(0);
-                Update_TIM3_CH2(0);
-                Update_TIM3_CH3(0);
-                Update_TIM3_CH4(0);
+                CTRL_CH1(0);
+                CTRL_CH2(0);
+                CTRL_CH3(0);
+                CTRL_CH4(0);
+                CTRL_CH5(0);
+                CTRL_CH6(0);
                 
                 if (signal_to_gen.frequency == 0)
                     timer_signals_gen = 50;
@@ -619,98 +403,6 @@ void GenerateSignalPulsed (void)
                     timer_signals_gen = 1000 / (signal_to_gen.frequency * 2);
 
                 pulsed_state = NO_GEN_PULSED;
-            }
-            else
-            {
-                //secuencia de leds
-                if (sequence_ready)
-                {
-                    sequence_ready_reset;
-                    if (undersampling < UNDERSAMPLING_TICKS)
-                        undersampling++;
-                    else
-                    {
-                        //PID CH1
-                        if (signal_to_gen.ch1_power_led >= I_MIN)
-                        {                        
-                            dummy = signal_to_gen.ch1_power_led * I_MAX;
-                            dummy >>= 8;
-                            d_ch1 = PID_roof (dummy, I_Sense_Ch1, d_ch1, &e_z1_ch1, &e_z2_ch1);
-                        }
-                        else
-                            d_ch1 = 0;
-
-                        if (d_ch1 < 0)
-                            d_ch1 = 0;
-                        else
-                        {
-                            if (d_ch1 > DUTY_70_PERCENT)
-                                d_ch1 = DUTY_70_PERCENT;
-
-                            Update_TIM3_CH1(d_ch1);
-                        }
-
-                        //PID CH2
-                        if (signal_to_gen.ch2_power_led >= I_MIN)
-                        {                        
-                            dummy = signal_to_gen.ch2_power_led * I_MAX;
-                            dummy >>= 8;
-                            d_ch2 = PID_roof (dummy, I_Sense_Ch2, d_ch2, &e_z1_ch2, &e_z2_ch2);
-                        }
-                        else
-                            d_ch2 = 0;
-
-                        if (d_ch2 < 0)
-                            d_ch2 = 0;
-                        else
-                        {
-                            if (d_ch2 > DUTY_70_PERCENT)
-                                d_ch2 = DUTY_70_PERCENT;
-
-                            Update_TIM3_CH2(d_ch2);
-                        }
-
-                        //PID CH3
-                        if (signal_to_gen.ch3_power_led >= I_MIN)
-                        {                        
-                            dummy = signal_to_gen.ch3_power_led * I_MAX;
-                            dummy >>= 8;
-                            d_ch3 = PID_roof (dummy, I_Sense_Ch3, d_ch3, &e_z1_ch3, &e_z2_ch3);
-                        }
-                        else
-                            d_ch3 = 0;
-
-                        if (d_ch3 < 0)
-                            d_ch3 = 0;
-                        else
-                        {
-                            if (d_ch3 > DUTY_70_PERCENT)
-                                d_ch3 = DUTY_70_PERCENT;
-
-                            Update_TIM3_CH3(d_ch3);
-                        }
-
-                        //PID CH4
-                        if (signal_to_gen.ch4_power_led >= I_MIN)
-                        {                        
-                            dummy = signal_to_gen.ch4_power_led * I_MAX;
-                            dummy >>= 8;
-                            d_ch4 = PID_roof (dummy, I_Sense_Ch4, d_ch4, &e_z1_ch4, &e_z2_ch4);
-                        }
-                        else
-                            d_ch4 = 0;
-
-                        if (d_ch4 < 0)
-                            d_ch4 = 0;
-                        else
-                        {
-                            if (d_ch4 > DUTY_70_PERCENT)
-                                d_ch4 = DUTY_70_PERCENT;
-
-                            Update_TIM3_CH4(d_ch4);
-                        }
-                    }    //end of undersampling
-                }    //end of secuence ready
             }
             break;
 
@@ -736,27 +428,12 @@ void GenerateSignalModulated (void)
     switch (modulated_state)
     {
         case INIT_MODULATED:
-            UpdateLaserCh1(0);
-            UpdateLaserCh2(0);
-            UpdateLaserCh3(0);
-            UpdateLaserCh4(0);
-
-            undersampling = UNDERSAMPLING_TICKS;    //para que arranque pid
-            d_ch1 = 0;
-            e_z1_ch1 = 0;
-            e_z2_ch1 = 0;
-
-            d_ch2 = 0;
-            e_z1_ch2 = 0;
-            e_z2_ch2 = 0;
-
-            d_ch3 = 0;
-            e_z1_ch3 = 0;
-            e_z2_ch3 = 0;
-
-            d_ch4 = 0;
-            e_z1_ch4 = 0;
-            e_z2_ch4 = 0;            
+            CTRL_CH1(0);
+            CTRL_CH2(0);
+            CTRL_CH3(0);
+            CTRL_CH4(0);
+            CTRL_CH5(0);
+            CTRL_CH6(0);
 
             modulated_index = 0;
             timer_signals_gen = 5;
@@ -775,47 +452,30 @@ void GenerateSignalModulated (void)
                 {
                     dummy = v_triangular[modulated_index];
 
-                    //Update Laser Channels
-                    dummy2 = signal_to_gen.ch1_power_laser * dummy;
+                    //Update Channels Power
+                    dummy2 = signal_to_gen.ch1_power * dummy;
                     dummy2 >>= 8;
-                    UpdateLaserCh1(dummy2);
+                    CTRL_CH1(dummy2);
 
-                    dummy2 = signal_to_gen.ch2_power_laser * dummy;
+                    dummy2 = signal_to_gen.ch2_power * dummy;
                     dummy2 >>= 8;
-                    UpdateLaserCh2(dummy2);
+                    CTRL_CH2(dummy2);
                     
-                    dummy2 = signal_to_gen.ch3_power_laser * dummy;
+                    dummy2 = signal_to_gen.ch3_power * dummy;
                     dummy2 >>= 8;
-                    UpdateLaserCh3(dummy2);
+                    CTRL_CH3(dummy2);
 
-                    dummy2 = signal_to_gen.ch4_power_laser * dummy;
+                    dummy2 = signal_to_gen.ch4_power * dummy;
                     dummy2 >>= 8;
-                    UpdateLaserCh4(dummy2);
+                    CTRL_CH4(dummy2);
 
-                    //Update LEDs, dummy ya cargado
-                    dummy2 = signal_to_gen.ch1_power_led * dummy;
+                    dummy2 = signal_to_gen.ch5_power * dummy;
                     dummy2 >>= 8;
-                    dummy2 = dummy2 * I_MAX;
-                    dummy2 >>= 8;
-                    mod_SP_ch1 = dummy2;
+                    CTRL_CH5(dummy2);
 
-                    dummy2 = signal_to_gen.ch2_power_led * dummy;
+                    dummy2 = signal_to_gen.ch5_power * dummy;
                     dummy2 >>= 8;
-                    dummy2 = dummy2 * I_MAX;
-                    dummy2 >>= 8;                    
-                    mod_SP_ch2 = dummy2;
-
-                    dummy2 = signal_to_gen.ch3_power_led * dummy;
-                    dummy2 >>= 8;
-                    dummy2 = dummy2 * I_MAX;
-                    dummy2 >>= 8;                    
-                    mod_SP_ch3 = dummy2;
-
-                    dummy2 = signal_to_gen.ch4_power_led * dummy;
-                    dummy2 >>= 8;
-                    dummy2 = dummy2 * I_MAX;
-                    dummy2 >>= 8;                    
-                    mod_SP_ch4 = dummy2;                    
+                    CTRL_CH6(dummy2);
 
                     timer_signals_gen = 5;
                 }
@@ -823,88 +483,6 @@ void GenerateSignalModulated (void)
                     modulated_state = INIT_MODULATED; 
 
             }
-
-            //para los led - secuencia de leds
-            if (sequence_ready)
-            {
-                sequence_ready_reset;
-                if (undersampling < UNDERSAMPLING_TICKS)
-                    undersampling++;
-                else
-                {
-                    //PID CH1, el setpoint se actualiza arriba
-                    if (signal_to_gen.ch1_power_led >= I_MIN)
-                    {                        
-                        d_ch1 = PID_roof (mod_SP_ch1, I_Sense_Ch1, d_ch1, &e_z1_ch1, &e_z2_ch1);
-                    }
-                    else
-                        d_ch1 = 0;
-
-                    if (d_ch1 < 0)
-                        d_ch1 = 0;
-                    else
-                    {
-                        if (d_ch1 > DUTY_70_PERCENT)
-                            d_ch1 = DUTY_70_PERCENT;
-
-                        Update_TIM3_CH1(d_ch1);
-                    }
-
-                    //PID CH2, el setpoint se actualiza arriba
-                    if (signal_to_gen.ch2_power_led >= I_MIN)
-                    {                        
-                        d_ch2 = PID_roof (mod_SP_ch2, I_Sense_Ch2, d_ch2, &e_z1_ch2, &e_z2_ch2);
-                    }
-                    else
-                        d_ch2 = 0;
-
-                    if (d_ch2 < 0)
-                        d_ch2 = 0;
-                    else
-                    {
-                        if (d_ch2 > DUTY_70_PERCENT)
-                            d_ch2 = DUTY_70_PERCENT;
-
-                        Update_TIM3_CH2(d_ch2);
-                    }
-
-                    //PID CH3, el setpoint se actualiza arriba
-                    if (signal_to_gen.ch3_power_led >= I_MIN)
-                    {                        
-                        d_ch3 = PID_roof (mod_SP_ch3, I_Sense_Ch3, d_ch3, &e_z1_ch3, &e_z2_ch3);
-                    }
-                    else
-                        d_ch3 = 0;
-
-                    if (d_ch3 < 0)
-                        d_ch3 = 0;
-                    else
-                    {
-                        if (d_ch3 > DUTY_70_PERCENT)
-                            d_ch3 = DUTY_70_PERCENT;
-
-                        Update_TIM3_CH3(d_ch3);
-                    }
-
-                    //PID CH4, el setpoint se actualiza arriba
-                    if (signal_to_gen.ch4_power_led >= I_MIN)
-                    {                        
-                        d_ch4 = PID_roof (mod_SP_ch4, I_Sense_Ch4, d_ch4, &e_z1_ch4, &e_z2_ch4);
-                    }
-                    else
-                        d_ch4 = 0;
-
-                    if (d_ch4 < 0)
-                        d_ch4 = 0;
-                    else
-                    {
-                        if (d_ch4 > DUTY_70_PERCENT)
-                            d_ch4 = DUTY_70_PERCENT;
-
-                        Update_TIM3_CH4(d_ch4);
-                    }
-                }    //end of undersampling
-            }    //end of secuence ready
 
             break;
 

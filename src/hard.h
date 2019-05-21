@@ -1,12 +1,12 @@
-//---------------------------------------------
-// #### PROYECTO LIPO LASER - Custom Board ####
+//--------------------------------------------------
+// #### PROYECTO LIGHT TREATMENT - Custom Board ####
 // ##
 // ## @Author: Med
 // ## @Editor: Emacs - ggtags
 // ## @TAGS:   Global
 // ##
-// #### HARD.C ################################
-//---------------------------------------------
+// #### HARD.C #####################################
+//--------------------------------------------------
 #ifndef _HARD_H_
 #define _HARD_H_
 
@@ -15,31 +15,21 @@
 
 //-- Defines For Configuration -------------------
 //---- Configuration for Hardware Versions -------
-#define HARDWARE_VERSION_1_1
-// #define HARDWARE_VERSION_1_0
+// #define HARDWARE_VERSION_1_1
+#define HARDWARE_VERSION_1_0
 
 
-#define SOFTWARE_VERSION_1_1
-// #define SOFTWARE_VERSION_1_0
+// #define SOFTWARE_VERSION_1_1
+#define SOFTWARE_VERSION_1_0
 
 
 //---- Features Configuration ----------------
-#define FIRST_POWER_BOARD
-// #define SECOND_POWER_BOARD
-
-//Modo de uso de la USART (placa individual single - placa enganchada bus)
-#define USART_IN_BUS
-// #define USART_SINGLE
 
 //------ Configuration for Firmware-Channels -----
 // #define LED_AND_LASER_SAME_POWER    //se toma la potencia de laser como master
 #define LED_AND_LASER_DIFFERENT_POWER
 
 //---- End of Features Configuration ----------
-#if defined USART_IN_BUS || defined SECOND_POWER_BOARD
-#define USART_TX_OUTPUT_OPEN_DRAIN
-#endif
-
 
 
 //--- Hardware Welcome Code ------------------//
@@ -75,32 +65,25 @@
 
 //-- End Of Defines For Configuration ---------------
 
-//GPIOA pin0
-//GPIOA pin1
-//GPIOA pin2
-//GPIOA pin3    4 ADC channels
+//GPIOA pin0    NC    
+//GPIOA pin1    NC
+//GPIOA pin2    NC
 
+//GPIOA pin3
 //GPIOA pin4
-#define TEST_P1 ((GPIOA->ODR & 0x0010) != 0)
-#define TEST_P1_ON GPIOA->BSRR = 0x00000010
-#define TEST_P1_OFF GPIOA->BSRR = 0x00100000
-
-//GPIOA pin5
-#define TEST_P2 ((GPIOA->ODR & 0x0020) != 0)
-#define TEST_P2_ON GPIOA->BSRR = 0x00000020
-#define TEST_P2_OFF GPIOA->BSRR = 0x00200000
+//GPIOA pin5    3 ADC channels
 
 //GPIOA pin6
 //GPIOA pin7
 //GPIOB pin0
 //GPIOB pin1    TIM3 CH1 - CH4
 
-//GPIOA pin8    NC
+//GPIOA pin8    TIM1 CH1
 
-//GPIOA pin9
+//GPIOA pin9    
 //GPIOA pin10    USART1
 
-//GPIOA pin11    NC
+//GPIOA pin11    TIM1 CH4
 
 //GPIOA pin12
 #define LED ((GPIOA->ODR & 0x1000) != 0)
@@ -110,25 +93,25 @@
 //GPIOA pin13
 //GPIOA pin14    NC
 
-//GPIOA pin15    LASER CH4
-#define LASER_CH4 ((GPIOA->ODR & 0x8000) != 0)
-#define LASER_CH4_OFF GPIOA->BSRR = 0x00008000
-#define LASER_CH4_ON GPIOA->BSRR = 0x80000000
+//GPIOA pin15    
+#define CTRL_FAN1 ((GPIOA->ODR & 0x8000) != 0)
+#define CTRL_FAN1_OFF GPIOA->BSRR = 0x00008000
+#define CTRL_FAN1_ON GPIOA->BSRR = 0x80000000
 
-//GPIOB pin3     LASER CH3
-#define LASER_CH3 ((GPIOB->ODR & 0x0008) != 0)
-#define LASER_CH3_OFF GPIOB->BSRR = 0x00000008
-#define LASER_CH3_ON GPIOB->BSRR = 0x00080000
+//GPIOB pin3     
+#define CTRL_FAN2 ((GPIOB->ODR & 0x0008) != 0)
+#define CTRL_FAN2_OFF GPIOB->BSRR = 0x00000008
+#define CTRL_FAN2_ON GPIOB->BSRR = 0x00080000
 
-//GPIOB pin4     LASER CH2
-#define LASER_CH2 ((GPIOB->ODR & 0x0010) != 0)
-#define LASER_CH2_OFF GPIOB->BSRR = 0x00000010
-#define LASER_CH2_ON GPIOB->BSRR = 0x00100000
+//GPIOB pin4     
+#define CTRL_FAN3 ((GPIOB->ODR & 0x0010) != 0)
+#define CTRL_FAN3_OFF GPIOB->BSRR = 0x00000010
+#define CTRL_FAN3_ON GPIOB->BSRR = 0x00100000
 
-//GPIOB pin5     LASER CH1
-#define LASER_CH1 ((GPIOB->ODR & 0x0020) != 0)
-#define LASER_CH1_OFF GPIOB->BSRR = 0x00000020
-#define LASER_CH1_ON GPIOB->BSRR = 0x00200000
+//GPIOB pin5     
+#define CTRL_FAN4 ((GPIOB->ODR & 0x0020) != 0)
+#define CTRL_FAN4_OFF GPIOB->BSRR = 0x00000020
+#define CTRL_FAN4_ON GPIOB->BSRR = 0x00200000
 
 //GPIOB pin6
 #define BUZZER ((GPIOB->ODR & 0x0040) != 0)
@@ -199,7 +182,7 @@ void ChangeLed (unsigned char);
 void UpdateLed (void);
 void UpdateBuzzer (void);
 void BuzzerCommands(unsigned char, unsigned char);
-
+void WelcomeCodeFeatures (void);
 
 #endif /* _HARD_H_ */
 

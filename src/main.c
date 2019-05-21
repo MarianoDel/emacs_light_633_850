@@ -1,12 +1,12 @@
-//---------------------------------------------
-// #### PROYECTO LIPO LASER - Custom Board ####
+//---------------------------------------------------
+// #### PROYnECTO LIGHT TREATMENT - Custom Board ####
 // ##
 // ## @Author: Med
 // ## @Editor: Emacs - ggtags
 // ## @TAGS:   Global
 // ##
-// #### MAIN.C ################################
-//---------------------------------------------
+// #### MAIN.C ######################################
+//---------------------------------------------------
 
 /* Includes ------------------------------------------------------------------*/
 #include "hard.h"
@@ -98,10 +98,10 @@ int main(void)
 
     //prueba modulo signals.c comm.c tim.c adc.c
     TIM_3_Init();
-    Update_TIM3_CH1(0);
-    Update_TIM3_CH2(0);
-    Update_TIM3_CH3(0);
-    Update_TIM3_CH4(0);
+    CTRL_CH1(0);
+    CTRL_CH2(0);
+    CTRL_CH3(0);
+    CTRL_CH4(0);
 
     //Activo el ADC con DMA
     AdcConfig();
@@ -112,29 +112,15 @@ int main(void)
 
     ADC1->CR |= ADC_CR_ADSTART;
 
-    TIM_14_Init();
-    UpdateLaserCh1(0);
-    UpdateLaserCh2(0);
-    UpdateLaserCh3(0);
-    UpdateLaserCh4(0);
 
     USART1Config();
 
     //--- Mensaje Bienvenida ---//
     //---- Defines from hard.h -----//
-#ifdef FIRST_POWER_BOARD
     Wait_ms(1000);
-    Usart1Send("\nLipoLaser -- powered by: Kirno Technology\n");
+    Usart1Send("\nLight Treatment -- powered by: Kirno Technology\n");
     Wait_ms(100);
     Usart1Send("First Power Board\n\n");
-#endif
-
-#ifdef SECOND_POWER_BOARD
-    Wait_ms(2000);
-    Usart1Send("\nLipoLaser -- powered by: Kirno Technology\n");
-    Wait_ms(100);
-    Usart1Send("Second Power Board\n\n");    
-#endif
     
 #ifdef HARD
     Usart1Send(HARD);
@@ -149,24 +135,17 @@ int main(void)
 #else
 #error	"No Soft Version defined in hard.h file"
 #endif
-    Usart1Send("Features:\n");
-#ifdef LED_AND_LASER_SAME_POWER
-    Usart1Send(" Led and Lasers use same power\n");
-#endif
-#ifdef LED_AND_LASER_DIFFERENT_POWER
-    Usart1Send(" Led and Lasers use differents power\n");
-#endif
 
+    WelcomeCodeFeatures();
+    
 //---- End of Defines from hard.h -----//
     
     while (1)
     {        
-        TreatmentManager();
+        // TreatmentManager();
         UpdateCommunications();
         UpdateLed();
-#ifdef FIRST_POWER_BOARD
         UpdateBuzzer();
-#endif
     }
 
     return 0;

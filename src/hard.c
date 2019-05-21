@@ -1,12 +1,12 @@
-//---------------------------------------------
-// #### PROYECTO LIPO LASER - Custom Board ####
+//--------------------------------------------------
+// #### PROYECTO LIGHT TREATMENT - Custom Board ####
 // ##
 // ## @Author: Med
 // ## @Editor: Emacs - ggtags
 // ## @TAGS:   Global
 // ##
-// #### HARD.C ################################
-//---------------------------------------------
+// #### HARD.C #####################################
+//--------------------------------------------------
 
 #include "hard.h"
 #include "stm32f0xx.h"
@@ -27,6 +27,7 @@ unsigned char how_many_blinks = 0;
 //para el buzzer
 buzzer_state_t buzzer_state = BUZZER_INIT;
 unsigned char buzzer_multiple;
+
 
 /* Module Functions ------------------------------------------------------------*/
 
@@ -202,4 +203,40 @@ void UpdateBuzzer (void)
             buzzer_state = BUZZER_INIT;
             break;
     }
+}
+
+void WelcomeCodeFeatures (void)
+{
+    char str[128] = {};
+    
+    // Features mostly on hardware
+#ifdef WITH_OVERCURRENT_SHUTDOWN
+    sprintf(str,"[%s] %s\n", __FILE__, str_macro(WITH_OVERCURRENT_SHUTDOWN));
+    Usart1Send(str);
+    Wait_ms(30);    
+#endif
+
+#ifdef USE_FREQ_75KHZ
+    sprintf(str,"[%s] %s\n", __FILE__, str_macro(USE_FREQ_75KHZ));
+    Usart1Send(str);
+    Wait_ms(30);    
+#endif
+
+#ifdef USE_FREQ_48KHZ
+    sprintf(str,"[%s] %s\n", __FILE__, str_macro(USE_FREQ_48KHZ));
+    Usart1Send(str);
+    Wait_ms(30);    
+#endif
+    
+#ifdef USE_LED_IN_INT
+    sprintf(str,"[%s] %s\n", __FILE__, str_macro(USE_LED_IN_INT));
+    Usart1Send(str);
+    Wait_ms(30);    
+#endif
+    
+#ifdef USE_LED_IN_PROT
+    sprintf(str,"[%s] %s\n", __FILE__, str_macro(USE_LED_IN_PROT));
+    Usart1Send(str);
+    Wait_ms(30);    
+#endif    
 }

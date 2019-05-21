@@ -47,6 +47,12 @@
 #define RCC_TIM17_CLK_ON 	RCC->APB2ENR |= 0x00040000
 #define RCC_TIM17_CLK_OFF 	RCC->APB2ENR &= ~0x00040000
 
+#define CTRL_CH1(X)    Update_TIM3_CH1(X)
+#define CTRL_CH2(X)    Update_TIM3_CH2(X)
+#define CTRL_CH3(X)    Update_TIM3_CH3(X)
+#define CTRL_CH4(X)    Update_TIM3_CH4(X)
+#define CTRL_CH5(X)    Update_TIM1_CH1(X)
+#define CTRL_CH6(X)    Update_TIM1_CH4(X)
 
 //--- Exported functions ---//
 void TIM3_IRQHandler (void);
@@ -58,14 +64,12 @@ void TIM16_IRQHandler (void);
 void TIM_16_Init(void);
 void TIM17_IRQHandler (void);
 void TIM_17_Init(void);
+void Update_TIM1_CH1 (unsigned short);
+void Update_TIM1_CH4 (unsigned short);
 void Update_TIM3_CH1 (unsigned short);
 void Update_TIM3_CH2 (unsigned short);
 void Update_TIM3_CH3 (unsigned short);
 void Update_TIM3_CH4 (unsigned short);
-void UpdateLaserCh1 (unsigned char);
-void UpdateLaserCh2 (unsigned char);
-void UpdateLaserCh3 (unsigned char);
-void UpdateLaserCh4 (unsigned char);
 
 void Wait_ms (unsigned short wait);
 

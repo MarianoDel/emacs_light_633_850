@@ -1,12 +1,12 @@
-//---------------------------------------------
-// #### PROYECTO LIPO LASER - Custom Board ####
+//--------------------------------------------------
+// #### PROYECTO LIGHT TREATMENT - Custom Board ####
 // ##
 // ## @Author: Med
 // ## @Editor: Emacs - ggtags
 // ## @TAGS:   Global
 // ##
-// #### SIGNALS.H #############################
-//---------------------------------------------
+// #### SIGNALS.H ##################################
+//--------------------------------------------------
 #ifndef _SIGNALS_H_
 #define _SIGNALS_H_
 #include "comm.h"		//para respuestas
@@ -45,21 +45,13 @@ typedef struct {
 
     unsigned char frequency;
 
-    unsigned char ch1_power_led;
-    unsigned char ch2_power_led;
-    unsigned char ch3_power_led;
-    unsigned char ch4_power_led;
-
-    unsigned char ch1_power_laser;
-    unsigned char ch2_power_laser;
-    unsigned char ch3_power_laser;
-    unsigned char ch4_power_laser;
+    unsigned char ch1_power;
+    unsigned char ch2_power;
+    unsigned char ch3_power;
+    unsigned char ch4_power;
+    unsigned char ch5_power;
+    unsigned char ch6_power;
     
-    //internals
-    unsigned short kprop;
-    unsigned short kinteg;
-    unsigned short kderv;
-
 } signals_struct_t;
 
 //Estados de las diferentes seniales

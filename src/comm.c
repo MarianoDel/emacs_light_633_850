@@ -1,12 +1,12 @@
-//---------------------------------------------
-// #### PROYECTO LIPO LASER - Custom Board ####
+//--------------------------------------------------
+// #### PROYECTO LIGHT TREATMENT - Custom Board ####
 // ##
 // ## @Author: Med
 // ## @Editor: Emacs - ggtags
 // ## @TAGS:   Global
 // ##
-// #### COMM.C ################################
-//---------------------------------------------
+// #### COMM.C #####################################
+//--------------------------------------------------
 
 /* Includes ------------------------------------------------------------------*/
 #include "comm.h"
@@ -32,18 +32,13 @@ extern unsigned char usart1_have_data;
 
 //strings de comienzo o lineas intermedias
 //--- Direccionamiento
-#ifdef FIRST_POWER_BOARD
+
 const char s_ch1 [] = {"ch1"};
 const char s_ch2 [] = {"ch2"};
 const char s_ch3 [] = {"ch3"};
 const char s_ch4 [] = {"ch4"};
-#endif
-#ifdef SECOND_POWER_BOARD
-const char s_ch1 [] = {"ch5"};
-const char s_ch2 [] = {"ch6"};
-const char s_ch3 [] = {"ch7"};
-const char s_ch4 [] = {"ch8"};
-#endif
+
+
 const char s_chf [] = {"chf"};
 //--- Available Settings
 const char s_set_signal [] = {"signal"};
@@ -114,15 +109,7 @@ resp_t InterpretarMsg (void)
         if (*(pStr + 2) == 'f')
             ch = 0x0F;
         else
-        {
-#ifdef FIRST_POWER_BOARD
             ch = *(pStr + 2) - 48;
-#endif
-#ifdef SECOND_POWER_BOARD
-            ch = *(pStr + 2) - 48;
-            ch -= 4;
-#endif
-        }
 
         pStr += sizeof(s_chf);	//normalizo al mensaje, hay un espacio
 
@@ -168,25 +155,8 @@ resp_t InterpretarMsg (void)
             decimales = StringIsANumber(pStr, &new_power);
             if (decimales < 4)
             {
-                resp = SetPowerLed (ch, new_power);
+                resp = SetPower (ch, new_power);
                 // sprintf(b, "ch: %d, dec: %d, power: %d\n", ch, decimales, new_power);
-                // Usart1Send(b);
-            }
-            else
-                resp = resp_error;
-        }
-
-        //-- Power Setting for Laser
-        else if (strncmp(pStr, s_power_laser, sizeof(s_power_laser) - 1) == 0)
-        {
-            pStr += sizeof(s_power_laser);		//normalizo al payload, hay un espacio
-
-            //lo que viene son 1 2 o 3 bytes
-            decimales = StringIsANumber(pStr, &new_power);
-            if (decimales < 4)
-            {
-                resp = SetPowerLaser (ch, new_power);
-                // sprintf(b, "dec: %d, power: %d\n", decimales, new_power);
                 // Usart1Send(b);
             }
             else

@@ -62,38 +62,23 @@ void GPIO_Config (void)
         GPIOA_CLK_ON;
 
     temp = GPIOA->MODER;	//2 bits por pin
-    temp &= 0x3CC30000;		//PA0 - PA3 (analog input); PA4 PA5 output; PA6 PA7(alternative)
-    temp |= 0x4128A5FF;		//PA9 - PA10 (alternative); PA12 & PA15 output
+    temp &= 0x3C00003F;		//PA3 - PA5 (analog input); PA6 PA7(alternative)
+    temp |= 0x41AAAFC0;		//PA8 - PA11 (alternative); PA12 & PA15 output
     GPIOA->MODER = temp;
 
     temp = GPIOA->OTYPER;	//1 bit por pin
-#ifdef USART_TX_OUTPUT_OPEN_DRAIN    
-    temp &= 0xFFFFFD3F;    //PA9 PA7 PA6 open drain
-    temp |= 0x000002C0;
-#else
-    temp &= 0xFFFFFF3F;    //PA7 PA6 open drain
-    temp |= 0x000000C0;
-#endif
+    temp &= 0xFFFFFFFF;    //PA7 PA6 open drain
+    temp |= 0x00000000;
     GPIOA->OTYPER = temp;
-
-//     temp = GPIOA->OTYPER;	//1 bit por pin
-
-//     temp &= 0xFFFFFDFF;
-//     temp |= 0x00000200;        //open drain PA10
-// #else
-//     temp &= 0xFFFFFFFF;
-//     temp |= 0x00000000; 
-// #endif
-//     GPIOA->OTYPER = temp;
     
     temp = GPIOA->OSPEEDR;	//2 bits por pin
-    temp &= 0x3CC300FF;
+    temp &= 0x3C000FFF;
     temp |= 0x00000000;		//low speed
     GPIOA->OSPEEDR = temp;
 
     temp = GPIOA->PUPDR;	//2 bits por pin
     temp &= 0xFFFFFFFF;
-    temp |= 0x00010050;
+    temp |= 0x00000000;
     GPIOA->PUPDR = temp;
 
 #ifdef GPIOB_ENABLE
@@ -108,8 +93,8 @@ void GPIO_Config (void)
     GPIOB->MODER = temp;
 
     temp = GPIOB->OTYPER;	//1 bit por pin
-    temp &= 0xFFFFFFFC;    //PB1 PB0 open drain
-    temp |= 0x00000003;
+    temp &= 0xFFFFFFFF;
+    temp |= 0x00000000;
     GPIOB->OTYPER = temp;
 
     temp = GPIOB->OSPEEDR;	//2 bits por pin
@@ -121,9 +106,6 @@ void GPIO_Config (void)
     temp &= 0xFFFFFFFF;
     temp |= 0x00000000;
     GPIOB->PUPDR = temp;
-
-    //Alternate Fuction
-    //GPIOB->AFR[0] = 0x11000000;	//PA7 -> AF1; PA6 -> AF1
 
 #endif
 

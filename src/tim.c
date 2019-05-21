@@ -18,52 +18,35 @@ extern volatile unsigned short wait_ms_var;
 
 //--- VARIABLES GLOBALES ---//
 
-volatile unsigned short timer_1000 = 0;
-volatile unsigned char tim14_counter = 0;
-volatile unsigned char set_laser_ch1 = 0;
-volatile unsigned char set_laser_ch2 = 0;
-volatile unsigned char set_laser_ch3 = 0;
-volatile unsigned char set_laser_ch4 = 0;
-
 //--- FUNCIONES DEL MODULO ---//
 void Update_TIM3_CH1 (unsigned short a)
 {
-	TIM3->CCR1 = a;
+    TIM3->CCR1 = a;
 }
 
 void Update_TIM3_CH2 (unsigned short a)
 {
-	TIM3->CCR2 = a;
+    TIM3->CCR2 = a;
 }
 
 void Update_TIM3_CH3 (unsigned short a)
 {
-	TIM3->CCR3 = a;
+    TIM3->CCR3 = a;
 }
 
 void Update_TIM3_CH4 (unsigned short a)
 {
-	TIM3->CCR4 = a;
+    TIM3->CCR4 = a;
 }
 
-inline void UpdateLaserCh1 (unsigned char a)
+void Update_TIM1_CH1 (unsigned short a)
 {
-    set_laser_ch1 = a;
+    TIM1->CCR1 = a;
 }
 
-inline void UpdateLaserCh2 (unsigned char a)
+void Update_TIM1_CH4 (unsigned short a)
 {
-    set_laser_ch2 = a;
-}
-
-inline void UpdateLaserCh3 (unsigned char a)
-{
-    set_laser_ch3 = a;
-}
-
-inline void UpdateLaserCh4 (unsigned char a)
-{
-    set_laser_ch4 = a;
+    TIM1->CCR4 = a;
 }
 
 void Wait_ms (unsigned short wait)
@@ -143,37 +126,6 @@ void TIM14_IRQHandler (void)	//20us
     if (TIM14->SR & 0x01)
         TIM14->SR = 0x00;    //bajar flag
 
-    if (tim14_counter < 255)
-    {
-        tim14_counter++;
-
-        if (tim14_counter > set_laser_ch1)
-            LASER_CH1_OFF;
-
-        if (tim14_counter > set_laser_ch2)
-            LASER_CH2_OFF;
-
-        if (tim14_counter > set_laser_ch3)
-            LASER_CH3_OFF;
-
-        if (tim14_counter > set_laser_ch4)
-            LASER_CH4_OFF;
-    }
-    else
-    {
-        tim14_counter = 0;    //Overflow
-        if (set_laser_ch1)
-            LASER_CH1_ON;
-
-        if (set_laser_ch2)
-            LASER_CH2_ON;
-
-        if (set_laser_ch3)
-            LASER_CH3_ON;
-
-        if (set_laser_ch4)
-            LASER_CH4_ON;
-    }
 }
 
 

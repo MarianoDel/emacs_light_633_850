@@ -23,11 +23,10 @@
 #endif
 //----------- End of ADC Configurations --------------//
 
-#define I_Sense_Ch1		adc_ch[0]
-#define I_Sense_Ch2		adc_ch[1]
-#define I_Sense_Ch3        	adc_ch[2]
-#define I_Sense_Ch4        	adc_ch[3]
-#define ADC_CHANNEL_QUANTITY         4
+#define LM335_VO		adc_ch[0]
+#define V_Sense_12V		adc_ch[1]
+#define V_Sense_24V        	adc_ch[2]
+#define ADC_CHANNEL_QUANTITY         3
 #define ADC_LAST_CHANNEL_QUANTITY    (ADC_CHANNEL_QUANTITY - 1)
 
 
