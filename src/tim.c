@@ -61,6 +61,88 @@ void Wait_ms (unsigned short wait)
 // @param  None
 // @retval None
 //------------------------------------------//
+
+void TIM_1_Init (void)
+{
+    unsigned long temp;
+
+    if (!RCC_TIM1_CLK)
+        RCC_TIM1_CLK_ON;
+
+    //Configuracion del timer.
+    TIM1->CR1 = 0x00;		//clk int / 1; upcounting
+    TIM1->CR2 |= TIM_CR2_MMS_1;		//UEV -> TRG0
+
+    TIM1->SMCR = 0x0000;
+    TIM1->CCMR1 = 0x0060;    //CH1 output PWM mode 1 (channel active TIM1->CNT < TIM1->CCR1)
+    TIM1->CCMR2 = 0x6000;    //CH4 output PWM mode 1 (channel active TIM1->CNT < TIM1->CCR1)
+    
+    TIM1->CCER |= TIM_CCER_CC4E | TIM_CCER_CC4P |
+        TIM_CCER_CC1E | TIM_CCER_CC1P;	//CH4 y CH1 enable on pin
+
+    TIM1->BDTR |= TIM_BDTR_MOE;
+    
+    TIM1->ARR = DUTY_100_PERCENT;
+    TIM1->CNT = 0;
+    TIM1->PSC = 0;		
+
+    //Alternate Fuction Pin Configurations
+    temp = GPIOA->AFR[1];
+    temp &= 0xFFFF0FF0;    
+    temp |= 0x00002002;    //PA11 -> AF2; PA8 -> AF2
+    GPIOA->AFR[1] = temp;
+
+    // Enable timer interrupt ver UDIS
+    // TIM1->DIER |= TIM_DIER_UIE;
+    // NVIC_EnableIRQ(TIM1_BRK_UP_TRG_COM_IRQn);
+    // NVIC_SetPriority(TIM1_BRK_UP_TRG_COM_IRQn, 1);
+    
+    TIM1->CR1 |= TIM_CR1_CEN;
+}
+
+
+void TIM_3_Init (void)
+{
+    unsigned long temp;
+    
+    if (!RCC_TIM3_CLK)
+        RCC_TIM3_CLK_ON;
+
+    //Configuracion del timer.
+    TIM3->CR1 = 0x00;		//clk int / 1; upcounting
+    TIM3->CR2 = 0x00;		//igual al reset
+
+    TIM3->SMCR |= TIM_SMCR_SMS_2;			//trigger: reset mode; link timer 1
+    // TIM3->SMCR |= TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1;	//trigger: trigger mode; link timer 1    
+    TIM3->CCMR1 = 0x6060;      //CH1, CH2 output PWM mode 1 (channel active TIM3->CNT < TIM3->CCR1)
+    TIM3->CCMR2 = 0x6060;      //CH3, CH4 output PWM mode 1 (channel active TIM3->CNT < TIM3->CCR1)
+    
+    TIM3->CCER |= TIM_CCER_CC4E | TIM_CCER_CC4P |
+        TIM_CCER_CC3E | TIM_CCER_CC3P |
+        TIM_CCER_CC2E | TIM_CCER_CC2P |
+        TIM_CCER_CC1E | TIM_CCER_CC1P;	//CH4 CH3 CH2 y CH1 enable on pin polarity reversal
+
+    TIM3->ARR = DUTY_100_PERCENT;        //tick cada 20.83us --> 48KHz
+    TIM3->CNT = 0;
+    TIM3->PSC = 0;		//original
+	
+    //Alternate Fuction Pin Configurations
+    temp = GPIOA->AFR[0];
+    temp &= 0x00FFFFFF;	
+    temp |= 0x11000000;    //PA7 -> AF1; PA6 -> AF1
+    GPIOA->AFR[0] = temp;
+
+    temp = GPIOB->AFR[0];
+    temp &= 0xFFFFFF00;	
+    temp |= 0x00000011;    //PB1 -> AF1; PB0 -> AF1
+    GPIOB->AFR[0] = temp;
+    
+    // Enable timer ver UDIS
+    //TIM3->DIER |= TIM_DIER_UIE;
+    TIM3->CR1 |= TIM_CR1_CEN;    
+}
+
+
 void TIM3_IRQHandler (void)	//1 ms
 {
 	/*
@@ -88,38 +170,6 @@ void TIM3_IRQHandler (void)	//1 ms
 		TIM3->SR = 0x00;
 }
 
-
-void TIM_3_Init (void)
-{
-    if (!RCC_TIM3_CLK)
-        RCC_TIM3_CLK_ON;
-
-    //Configuracion del timer.
-    TIM3->CR1 = 0x00;		//clk int / 1; upcounting
-    TIM3->CR2 |= TIM_CR2_MMS_1;		//UEV -> TRG0 and info de sync al ADC
-    // TIM3->CR2 = 0x00;		//igual al reset
-    TIM3->CCMR1 = 0x6060;      //CH1, CH2 output PWM mode 1 (channel active TIM3->CNT < TIM3->CCR1)
-    TIM3->CCMR2 = 0x6060;      //CH3, CH4 output PWM mode 1 (channel active TIM3->CNT < TIM3->CCR1)
-    
-    TIM3->CCER |= TIM_CCER_CC4E | TIM_CCER_CC4P | TIM_CCER_CC3E | TIM_CCER_CC3P | TIM_CCER_CC2E | TIM_CCER_CC2P | TIM_CCER_CC1E | TIM_CCER_CC1P;	//CH4 CH3 CH2 y CH1 enable on pin polarity reversal
-
-    TIM3->ARR = DUTY_100_PERCENT;        //tick cada 20.83us --> 48KHz
-    TIM3->CNT = 0;
-    TIM3->PSC = 0;		//original
-	
-    //TIM3->PSC = 1119;		//para pruebas
-    //TIM3->EGR = TIM_EGR_UG;
-
-    // Enable timer ver UDIS
-    //TIM3->DIER |= TIM_DIER_UIE;
-    TIM3->CR1 |= TIM_CR1_CEN;
-
-    //Configuracion Pines
-    //Alternate Fuction
-    GPIOA->AFR[0] = 0x11000000;	//PA7 -> AF1; PA6 -> AF1
-    GPIOB->AFR[0] = 0x00000011;	//PB1 -> AF1; PB0 -> AF1
-
-}
 
 void TIM14_IRQHandler (void)	//20us
 {

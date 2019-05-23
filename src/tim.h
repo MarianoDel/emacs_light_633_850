@@ -55,8 +55,9 @@
 #define CTRL_CH6(X)    Update_TIM1_CH4(X)
 
 //--- Exported functions ---//
-void TIM3_IRQHandler (void);
+void TIM_1_Init(void);
 void TIM_3_Init(void);
+void TIM3_IRQHandler (void);
 void TIM_6_Init (void);
 void TIM14_IRQHandler (void);
 void TIM_14_Init(void);

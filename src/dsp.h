@@ -9,7 +9,7 @@
 #define _DSP_H_
 
 //--- Defines for Configuration ------------------------------
-#define USE_PID_CONTROLLERS
+// #define USE_PID_CONTROLLERS
 // #define USE_MA8_CIRCULAR
 
 //--- Exported types ---//

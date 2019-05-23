@@ -31,6 +31,9 @@ unsigned short v_ma8 [8];
 unsigned short * p_ma8;
 #endif
 /* Module Definitions ---------------------------------------------------------*/
+
+#ifdef USE_PID_CONTROLLERS
+// PID constants
 //todos se dividen por 128
 #define KPV	857			// 6.7 desde python PI_zpk_KpKi.py
 #define KIV	844			// 6.6 desde python PI_zpk_KpKi.py
@@ -52,11 +55,12 @@ unsigned short * p_ma8;
 
 #define STRING2(x) #x
 #define STRING(x) STRING2(x)
-// #warning STRING(K1V)
-// #pragma message K1V
+
 #pragma message(STRING(K1I))
 #pragma message(STRING(K2I))
 #pragma message(STRING(K3I))
+
+#endif    //USE_PID_CONTROLLERS
 
 
 /* Module functions ---------------------------------------------------------*/

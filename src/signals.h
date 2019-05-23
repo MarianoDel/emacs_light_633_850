@@ -98,8 +98,7 @@ typedef enum
 //--- Exported functions ---//
 resp_t SetSignalType (signal_type_t);
 resp_t SetFrequency (unsigned char);
-resp_t SetPowerLed (unsigned char, unsigned char);
-resp_t SetPowerLaser (unsigned char, unsigned char);
+resp_t SetPower (unsigned char, unsigned char);
 void GenerateSignalCWave (void);
 void GenerateSignalPulsed (void);
 void GenerateSignalModulated (void);
