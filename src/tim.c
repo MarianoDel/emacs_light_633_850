@@ -84,7 +84,16 @@ void TIM_1_Init (void)
     
     TIM1->ARR = DUTY_100_PERCENT;
     TIM1->CNT = 0;
-    TIM1->PSC = 0;		
+
+#if defined USE_FREQ_48KHZ
+    TIM1->PSC = 0;
+#elif defined USE_FREQ_24KHZ
+    TIM1->PSC = 1;
+#elif defined USE_FREQ_12KHZ
+    TIM1->PSC = 2;
+#else
+#error "No FREQ selected for TIM1 on hard.h"
+#endif
 
     //Alternate Fuction Pin Configurations
     temp = GPIOA->AFR[1];
@@ -124,7 +133,16 @@ void TIM_3_Init (void)
 
     TIM3->ARR = DUTY_100_PERCENT;        //tick cada 20.83us --> 48KHz
     TIM3->CNT = 0;
-    TIM3->PSC = 0;		//original
+
+#if defined USE_FREQ_48KHZ
+    TIM3->PSC = 0;
+#elif defined USE_FREQ_24KHZ
+    TIM3->PSC = 1;
+#elif defined USE_FREQ_12KHZ
+    TIM3->PSC = 2;
+#else
+#error "No FREQ selected for TIM3 on hard.h"
+#endif
 	
     //Alternate Fuction Pin Configurations
     temp = GPIOA->AFR[0];

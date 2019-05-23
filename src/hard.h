@@ -24,10 +24,11 @@
 
 
 //---- Features Configuration ----------------
+// #define USE_FREQ_48KHZ
+#define USE_FREQ_24KHZ
+// #define USE_FREQ_12KHZ
 
 //------ Configuration for Firmware-Channels -----
-// #define LED_AND_LASER_SAME_POWER    //se toma la potencia de laser como master
-#define LED_AND_LASER_DIFFERENT_POWER
 
 //---- End of Features Configuration ----------
 
