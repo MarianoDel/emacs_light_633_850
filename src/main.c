@@ -1,5 +1,5 @@
 //---------------------------------------------------
-// #### PROYnECTO LIGHT TREATMENT - Custom Board ####
+// #### PROYECTO LIGHT TREATMENT - Custom Board #####
 // ##
 // ## @Author: Med
 // ## @Editor: Emacs - ggtags
@@ -8,7 +8,7 @@
 // #### MAIN.C ######################################
 //---------------------------------------------------
 
-/* Includes ------------------------------------------------------------------*/
+// Includes ------------------------------------------
 #include "hard.h"
 #include "stm32f0xx.h"
 #include "gpio.h"
@@ -26,57 +26,40 @@
 // #include <string.h>
 
 
-
-
-//--- VARIABLES EXTERNAS ---//
-// ------- Externals del ADC -------
+// External Variables --------------------------------
+//-- ADC externals -----------------------------------
 volatile unsigned short adc_ch [ADC_CHANNEL_QUANTITY];
 
-// ------- Externals de los timers -------
+//-- Timers externals --------------------------------
 volatile unsigned char timer_1seg = 0;
 volatile unsigned short timer_signals = 0;
 volatile unsigned short timer_signals_gen = 0;
 volatile unsigned short timer_led = 0;
 volatile unsigned short timer_buzzer = 0;
 
-// ------- Externals del USART -------
+//-- Usart externals ---------------------------------
 volatile unsigned char usart1_have_data;
 
 
-//--- VARIABLES GLOBALES ---//
-
-
-// ------- de los timers -------
+// Global Variables ----------------------------------
+//-- Timers globals ----------------------------------
 volatile unsigned short timer_standby;
 volatile unsigned short wait_ms_var = 0;
 
-//--- FUNCIONES DEL MODULO ---//
+
+// Module Functions Declaration ----------------------
 void TimingDelay_Decrement(void);
 
 
-// ------- del DMX -------
-// extern void EXTI4_15_IRQHandler(void);
-
-
-//-------------------------------------------//
-// @brief  Main program.
-// @param  None
-// @retval None
-//------------------------------------------//
+// Module Functions Definition -----------------------
 int main(void)
 {
     unsigned short i = 0;
-    // char s_to_senda [100];    
-    // unsigned char bytes_readed = 0;
 
     //GPIO Configuration.
     GPIO_Config();
 
-    //TIM Configuration.
-    // TIM_3_Init();
-    // TIM_14_Init();
-
-    //ACTIVAR SYSTICK TIMER
+    //Systick Timer
     if (SysTick_Config(48000))
     {
         while (1)	/* Capture error */
@@ -96,27 +79,27 @@ int main(void)
     }
 
     //Hard Test LED
-    while (1)
-    {
-        if (LED)
-            LED_OFF;
-        else
-            LED_ON;
+    // while (1)
+    // {
+    //     if (LED)
+    //         LED_OFF;
+    //     else
+    //         LED_ON;
 
-        Wait_ms(1000);
-    }
+    //     Wait_ms(1000);
+    // }
 
     //Hard Test Buzzer
-    while (1)
-    {
-        if (!timer_standby)
-        {
-            timer_standby = 5000;
-            BuzzerCommands(BUZZER_SHORT_CMD, 2);
-        }
+    // while (1)
+    // {
+    //     if (!timer_standby)
+    //     {
+    //         timer_standby = 5000;
+    //         BuzzerCommands(BUZZER_SHORT_CMD, 2);
+    //     }
         
-        UpdateBuzzer();
-    }
+    //     UpdateBuzzer();
+    // }
 
     //Hard Test CTRL FAN
     CTRL_FAN1_OFF;
