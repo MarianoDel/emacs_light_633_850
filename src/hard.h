@@ -25,8 +25,8 @@
 
 //---- Features Configuration ----------------
 // #define USE_FREQ_48KHZ
-#define USE_FREQ_24KHZ
-// #define USE_FREQ_12KHZ
+// #define USE_FREQ_24KHZ
+#define USE_FREQ_16KHZ
 
 //------ Configuration for Firmware-Channels -----
 

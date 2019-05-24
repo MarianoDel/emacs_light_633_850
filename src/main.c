@@ -102,110 +102,132 @@ int main(void)
     // }
 
     //Hard Test CTRL FAN
-    CTRL_FAN1_OFF;
-    CTRL_FAN2_OFF;
-    CTRL_FAN3_OFF;
-    CTRL_FAN4_OFF;
-    while (1)
-    {
-        switch (i)
-        {
-        case 0:
-            if (!timer_standby)
-            {
-                timer_standby = 5000;
-                i++;
-                CTRL_FAN1_ON;
-                CTRL_FAN4_OFF;
-            }
-            break;
-        case 1:
-            if (!timer_standby)
-            {
-                timer_standby = 5000;
-                i++;
-                CTRL_FAN2_ON;
-                CTRL_FAN1_OFF;
-            }
-            break;
-        case 2:
-            if (!timer_standby)
-            {
-                timer_standby = 5000;
-                i++;
-                CTRL_FAN3_ON;
-                CTRL_FAN2_OFF;
-            }
-            break;
-        case 3:
-            if (!timer_standby)
-            {
-                timer_standby = 5000;
-                i = 0;
-                CTRL_FAN4_ON;
-                CTRL_FAN3_OFF;
-            }
-            break;
+    // CTRL_FAN1_OFF;
+    // CTRL_FAN2_OFF;
+    // CTRL_FAN3_OFF;
+    // CTRL_FAN4_OFF;
+    // while (1)
+    // {
+    //     switch (i)
+    //     {
+    //     case 0:
+    //         if (!timer_standby)
+    //         {
+    //             timer_standby = 5000;
+    //             i++;
+    //             CTRL_FAN1_ON;
+    //             CTRL_FAN4_OFF;
+    //         }
+    //         break;
+    //     case 1:
+    //         if (!timer_standby)
+    //         {
+    //             timer_standby = 5000;
+    //             i++;
+    //             CTRL_FAN2_ON;
+    //             CTRL_FAN1_OFF;
+    //         }
+    //         break;
+    //     case 2:
+    //         if (!timer_standby)
+    //         {
+    //             timer_standby = 5000;
+    //             i++;
+    //             CTRL_FAN3_ON;
+    //             CTRL_FAN2_OFF;
+    //         }
+    //         break;
+    //     case 3:
+    //         if (!timer_standby)
+    //         {
+    //             timer_standby = 5000;
+    //             i = 0;
+    //             CTRL_FAN4_ON;
+    //             CTRL_FAN3_OFF;
+    //         }
+    //         break;
 
-        default:
-            i = 0;
-            break;
-        }
-    }
+    //     default:
+    //         i = 0;
+    //         break;
+    //     }
+    // }
 
 
     //Hard Test Usart Tx & Rx
-    USART1Config();
-    char str [SIZEOF_RXDATA];
-    while (1)
-    {
-        if (!timer_standby)
-        {
-            timer_standby = 2000;
-            Usart1Send("Test Usart1\n");
-        }
+    // USART1Config();
+    // char str [SIZEOF_RXDATA];
+    // while (1)
+    // {
+    //     if (!timer_standby)
+    //     {
+    //         timer_standby = 2000;
+    //         Usart1Send("Test Usart1\n");
+    //     }
 
-        if (usart1_have_data)
-        {            
-            usart1_have_data = 0;
-            timer_standby = 2000;
-            ReadUsart1Buffer((unsigned char *)str, SIZEOF_RXDATA);
-            Usart1Send(str);
-        }            
-    }
+    //     if (usart1_have_data)
+    //     {            
+    //         usart1_have_data = 0;
+    //         timer_standby = 2000;
+    //         ReadUsart1Buffer((unsigned char *)str, SIZEOF_RXDATA);
+    //         Usart1Send(str);
+    //     }            
+    // }
 
-    //Hard Test Channels
-    TIM_3_Init();
-    TIM_1_Init();
-    CTRL_CH1(0);
-    CTRL_CH2(0);
-    CTRL_CH3(0);
-    CTRL_CH4(0);
-    CTRL_CH5(0);
-    CTRL_CH6(0);
+    //Hard Test Channels Fixed
+    // TIM_3_Init();
+    // TIM_1_Init();
+    // CTRL_CH1(DUTY_20_PERCENT);
+    // CTRL_CH2(DUTY_20_PERCENT);
+    // CTRL_CH3(DUTY_20_PERCENT);
+    // CTRL_CH4(DUTY_20_PERCENT);
+    // CTRL_CH5(DUTY_20_PERCENT);
+    // CTRL_CH6(DUTY_20_PERCENT);
+    // while (1);
+    
+    //Hard Test Channels Dimmering
+    // TIM_3_Init();
+    // TIM_1_Init();
+    // CTRL_CH1(DUTY_NONE);
+    // CTRL_CH2(DUTY_NONE);
+    // CTRL_CH3(DUTY_NONE);
+    // CTRL_CH4(DUTY_NONE);
+    // CTRL_CH5(DUTY_NONE);
+    // CTRL_CH6(DUTY_NONE);
 
-    while (1)
-    {
-        if (!timer_standby)
-        {
-            timer_standby = 2;
-            if (i < DUTY_ALWAYS)
-                i++;
-            else
-                i = 0;
+    // while (1)
+    // {
+    //     if (!timer_standby)
+    //     {
+    //         timer_standby = 2;
+    //         if (i < DUTY_ALWAYS)
+    //             i++;
+    //         else
+    //             i = 0;
 
-            CTRL_CH1(i);
-            CTRL_CH2(i);
-            CTRL_CH3(i);
-            CTRL_CH4(i);
-            CTRL_CH5(i);
-            CTRL_CH6(i);
-        }
-    }
+    //         CTRL_CH1(i);
+    //         CTRL_CH2(i);
+    //         CTRL_CH3(i);
+    //         CTRL_CH4(i);
+    //         CTRL_CH5(i);
+    //         CTRL_CH6(i);
+    //     }
+    // }
 
 
     //Hard Test ADC
-    // char str [SIZEOF_RXDATA];
+    USART1Config();
+    char str [SIZEOF_RXDATA] = {'\0'};
+
+    TIM_3_Init();
+    TIM_1_Init();
+    CTRL_CH1(DUTY_10_PERCENT);
+    CTRL_CH2(DUTY_NONE);
+    CTRL_CH3(DUTY_NONE);
+    CTRL_CH4(DUTY_NONE);
+    CTRL_CH5(DUTY_NONE);
+    CTRL_CH6(DUTY_NONE);
+
     //Activo el ADC con DMA
     AdcConfig();
 
@@ -220,11 +242,16 @@ int main(void)
     {
         if (sequence_ready)
         {
+            if (LED)
+                LED_OFF;
+            else
+                LED_ON;
+            
             sequence_ready_reset;
             i++;
         }
 
-        if (i > 1000)
+        if (i > 48000)
         {
             i = 0;
             sprintf(str, "Temp: %d, V12: %d, V24: %d\n",

@@ -77,8 +77,7 @@ void TIM_1_Init (void)
     TIM1->CCMR1 = 0x0060;    //CH1 output PWM mode 1 (channel active TIM1->CNT < TIM1->CCR1)
     TIM1->CCMR2 = 0x6000;    //CH4 output PWM mode 1 (channel active TIM1->CNT < TIM1->CCR1)
     
-    TIM1->CCER |= TIM_CCER_CC4E | TIM_CCER_CC4P |
-        TIM_CCER_CC1E | TIM_CCER_CC1P;	//CH4 y CH1 enable on pin
+    TIM1->CCER |= TIM_CCER_CC4E | TIM_CCER_CC1E;	//CH4 y CH1 enable on pin direct polarity
 
     TIM1->BDTR |= TIM_BDTR_MOE;
     
@@ -89,7 +88,7 @@ void TIM_1_Init (void)
     TIM1->PSC = 0;
 #elif defined USE_FREQ_24KHZ
     TIM1->PSC = 1;
-#elif defined USE_FREQ_12KHZ
+#elif defined USE_FREQ_16KHZ
     TIM1->PSC = 2;
 #else
 #error "No FREQ selected for TIM1 on hard.h"
@@ -126,10 +125,8 @@ void TIM_3_Init (void)
     TIM3->CCMR1 = 0x6060;      //CH1, CH2 output PWM mode 1 (channel active TIM3->CNT < TIM3->CCR1)
     TIM3->CCMR2 = 0x6060;      //CH3, CH4 output PWM mode 1 (channel active TIM3->CNT < TIM3->CCR1)
     
-    TIM3->CCER |= TIM_CCER_CC4E | TIM_CCER_CC4P |
-        TIM_CCER_CC3E | TIM_CCER_CC3P |
-        TIM_CCER_CC2E | TIM_CCER_CC2P |
-        TIM_CCER_CC1E | TIM_CCER_CC1P;	//CH4 CH3 CH2 y CH1 enable on pin polarity reversal
+    TIM3->CCER |= TIM_CCER_CC4E | TIM_CCER_CC3E |
+        TIM_CCER_CC2E | TIM_CCER_CC1E;	//CH4 CH3 CH2 y CH1 enable on pin direct polarity
 
     TIM3->ARR = DUTY_100_PERCENT;        //tick cada 20.83us --> 48KHz
     TIM3->CNT = 0;
@@ -138,7 +135,7 @@ void TIM_3_Init (void)
     TIM3->PSC = 0;
 #elif defined USE_FREQ_24KHZ
     TIM3->PSC = 1;
-#elif defined USE_FREQ_12KHZ
+#elif defined USE_FREQ_16KHZ
     TIM3->PSC = 2;
 #else
 #error "No FREQ selected for TIM3 on hard.h"
