@@ -203,7 +203,10 @@ int main(void)
     //         if (i < DUTY_ALWAYS)
     //             i++;
     //         else
+    //         {
     //             i = 0;
+    //             timer_standby += 998;
+    //         }
 
     //         CTRL_CH1(i);
     //         CTRL_CH2(i);
@@ -216,52 +219,53 @@ int main(void)
 
 
     //Hard Test ADC
-    USART1Config();
-    char str [SIZEOF_RXDATA] = {'\0'};
+    // USART1Config();
+    // char str [SIZEOF_RXDATA] = {'\0'};
 
-    TIM_3_Init();
-    TIM_1_Init();
-    CTRL_CH1(DUTY_10_PERCENT);
-    CTRL_CH2(DUTY_NONE);
-    CTRL_CH3(DUTY_NONE);
-    CTRL_CH4(DUTY_NONE);
-    CTRL_CH5(DUTY_NONE);
-    CTRL_CH6(DUTY_NONE);
+    // TIM_3_Init();
+    // TIM_1_Init();
+    // CTRL_CH1(DUTY_10_PERCENT);
+    // CTRL_CH2(DUTY_NONE);
+    // CTRL_CH3(DUTY_NONE);
+    // CTRL_CH4(DUTY_NONE);
+    // CTRL_CH5(DUTY_NONE);
+    // CTRL_CH6(DUTY_NONE);
+    // // while (1);
+    
+    // //Activo el ADC con DMA
+    // AdcConfig();
 
-    //Activo el ADC con DMA
-    AdcConfig();
+    // //-- DMA configuration.
+    // DMAConfig();
+    // DMA1_Channel1->CCR |= DMA_CCR_EN;
 
-    //-- DMA configuration.
-    DMAConfig();
-    DMA1_Channel1->CCR |= DMA_CCR_EN;
+    // ADC1->CR |= ADC_CR_ADSTART;
 
-    ADC1->CR |= ADC_CR_ADSTART;
-
-    i = 0;
-    while (1)
-    {
-        if (sequence_ready)
-        {
-            if (LED)
-                LED_OFF;
-            else
-                LED_ON;
+    // i = 0;
+    // while (1)
+    // {
+    //     if (sequence_ready)
+    //     {
+    //         if (LED)
+    //             LED_OFF;
+    //         else
+    //             LED_ON;
             
-            sequence_ready_reset;
-            i++;
-        }
+    //         sequence_ready_reset;
+    //         i++;
+    //     }
 
-        if (i > 48000)
-        {
-            i = 0;
-            sprintf(str, "Temp: %d, V12: %d, V24: %d\n",
-                    LM335_VO,
-                    V_Sense_12V,
-                    V_Sense_24V);
+    //     if (i > 48000)
+    //     {
+    //         i = 0;
+    //         sprintf(str, "Temp: %d, V12: %d, V24: %d\n",
+    //                 LM335_VO,
+    //                 V_Sense_12V,
+    //                 V_Sense_24V);
 
-            Usart1Send(str);
-        }
-    }
+    //         Usart1Send(str);
+    //     }
+    // }
 
 
 

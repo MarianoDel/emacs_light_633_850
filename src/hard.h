@@ -66,13 +66,18 @@
 
 //-- End Of Defines For Configuration ---------------
 
-//GPIOA pin0    NC    
-//GPIOA pin1    NC
-//GPIOA pin2    NC
+//GPIOA pin0    V_Sense_24V analog input
+//GPIOA pin1    V_Sense_12V analog input
 
-//GPIOA pin3
+//GPIOA pin2    NC
+//GPIOA pin3    NC
+
 //GPIOA pin4
-//GPIOA pin5    3 ADC channels
+#define EN_AUDIO ((GPIOA->ODR & 0x0010) != 0)
+#define EN_AUDIO_ON GPIOA->BSRR = 0x00000010
+#define EN_AUDIO_OFF GPIOA->BSRR = 0x00100000
+
+//GPIOA pin5    LM335_VO analog input
 
 //GPIOA pin6
 //GPIOA pin7

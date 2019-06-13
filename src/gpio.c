@@ -62,8 +62,8 @@ void GPIO_Config (void)
         GPIOA_CLK_ON;
 
     temp = GPIOA->MODER;	//2 bits por pin
-    temp &= 0x3C00003F;		//PA3 - PA5 (analog input); PA6 PA7(alternative)
-    temp |= 0x41AAAFC0;		//PA8 - PA11 (alternative); PA12 & PA15 output
+    temp &= 0x3C0000F0;		//PA0 - PA1 (analog input); PA4 output; PA5 (analog input) PA6 PA7(alternative)
+    temp |= 0x41AAAD0F;		//PA8 - PA11 (alternative); PA12 & PA15 output
     GPIOA->MODER = temp;
 
     temp = GPIOA->OTYPER;	//1 bit por pin
