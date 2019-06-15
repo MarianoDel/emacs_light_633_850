@@ -37,14 +37,16 @@ const char s_ch1 [] = {"ch1"};
 const char s_ch2 [] = {"ch2"};
 const char s_ch3 [] = {"ch3"};
 const char s_ch4 [] = {"ch4"};
+const char s_ch5 [] = {"ch5"};
+const char s_ch6 [] = {"ch6"};
 
 
 const char s_chf [] = {"chf"};
 //--- Available Settings
 const char s_set_signal [] = {"signal"};
 const char s_frequency [] = {"frequency"};
-const char s_power_led [] = {"power led"};
-const char s_power_laser [] = {"power laser"};
+const char s_power [] = {"power"};
+
 //--- Available Signals
 const char s_cwave [] = {"cwave"};
 const char s_pulsed [] = {"pulsed"};
@@ -57,6 +59,10 @@ const char s_getall [] = {"get all conf"};
 const char s_buzzer_short [] = {"buzzer short"};
 const char s_buzzer_half [] = {"buzzer half"};
 const char s_buzzer_long [] = {"buzzer long"};
+const char s_fan1 [] = {"fan1"};
+const char s_fan2 [] = {"fan2"};
+const char s_fan3 [] = {"fan3"};
+const char s_fan4 [] = {"fan4"};
 
 
 
@@ -101,6 +107,8 @@ resp_t InterpretarMsg (void)
         (strncmp(pStr, s_ch2, sizeof(s_chf) - 1) == 0) ||
         (strncmp(pStr, s_ch3, sizeof(s_chf) - 1) == 0) ||
         (strncmp(pStr, s_ch4, sizeof(s_chf) - 1) == 0) ||
+        (strncmp(pStr, s_ch5, sizeof(s_chf) - 1) == 0) ||
+        (strncmp(pStr, s_ch6, sizeof(s_chf) - 1) == 0) ||
         (strncmp(pStr, s_chf, sizeof(s_chf) - 1) == 0))
     {
         resp = resp_ok;
@@ -147,9 +155,9 @@ resp_t InterpretarMsg (void)
         }
 
         //-- Power Setting for Leds
-        else if (strncmp(pStr, s_power_led, sizeof(s_power_led) - 1) == 0)
+        else if (strncmp(pStr, s_power, sizeof(s_power) - 1) == 0)
         {
-            pStr += sizeof(s_power_led);		//normalizo al payload, hay un espacio
+            pStr += sizeof(s_power);		//normalizo al payload, hay un espacio
 
             //lo que viene son 1 2 o 3 bytes
             decimales = StringIsANumber(pStr, &new_power);
@@ -246,7 +254,76 @@ resp_t InterpretarMsg (void)
             else
                 resp = resp_error;
         }
-        
+
+        // FAN Control
+        else if (strncmp(pStr, s_fan1, sizeof(s_fan1) - 1) == 0)
+        {
+            pStr += sizeof(s_fan1);		//normalizo al payload, hay un espacio
+
+            //lo que viene es un byte de 1 a 9
+            decimales = StringIsANumber(pStr, &new_power);
+            if (decimales == 1)
+            {
+                if (new_power)
+                    CTRL_FAN1_ON;
+                else
+                    CTRL_FAN1_OFF;
+            }
+            else
+                resp = resp_error;
+        }
+
+        else if (strncmp(pStr, s_fan2, sizeof(s_fan2) - 1) == 0)
+        {
+            pStr += sizeof(s_fan2);		//normalizo al payload, hay un espacio
+
+            //lo que viene es un byte de 1 a 9
+            decimales = StringIsANumber(pStr, &new_power);
+            if (decimales == 1)
+            {
+                if (new_power)
+                    CTRL_FAN2_ON;
+                else
+                    CTRL_FAN2_OFF;
+            }
+            else
+                resp = resp_error;
+        }
+
+        else if (strncmp(pStr, s_fan3, sizeof(s_fan3) - 1) == 0)
+        {
+            pStr += sizeof(s_fan3);		//normalizo al payload, hay un espacio
+
+            //lo que viene es un byte de 1 a 9
+            decimales = StringIsANumber(pStr, &new_power);
+            if (decimales == 1)
+            {
+                if (new_power)
+                    CTRL_FAN3_ON;
+                else
+                    CTRL_FAN3_OFF;
+            }
+            else
+                resp = resp_error;
+        }
+
+        else if (strncmp(pStr, s_fan4, sizeof(s_fan4) - 1) == 0)
+        {
+            pStr += sizeof(s_fan4);		//normalizo al payload, hay un espacio
+
+            //lo que viene es un byte de 1 a 9
+            decimales = StringIsANumber(pStr, &new_power);
+            if (decimales == 1)
+            {
+                if (new_power)
+                    CTRL_FAN4_ON;
+                else
+                    CTRL_FAN4_OFF;
+            }
+            else
+                resp = resp_error;
+        }
+
 
         //reviso errores y envio
         // 	error_t e;

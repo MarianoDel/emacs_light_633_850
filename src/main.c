@@ -89,6 +89,17 @@ int main(void)
     //     Wait_ms(1000);
     // }
 
+    //Hard Test EN_AUDIO
+    // while (1)
+    // {
+    //     if (EN_AUDIO)
+    //         EN_AUDIO_OFF;
+    //     else
+    //         EN_AUDIO_ON;
+
+    //     Wait_ms(5000);
+    // }
+
     //Hard Test Buzzer
     // while (1)
     // {
