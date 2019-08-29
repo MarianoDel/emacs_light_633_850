@@ -74,18 +74,21 @@ const unsigned char v_triangular [] = {0,2,5,7,10,12,15,17,20,22,
                                      22,20,17,15,12,10,7,5,2};
 
 
+//-- Module private Functions
+unsigned short CalcPowerOffset(unsigned char);
+
 //--- FUNCIONES DEL MODULO ---//
 void TreatmentManager (void)
 {
     switch (treatment_state)
     {
         case TREATMENT_INIT_FIRST_TIME:
-            CTRL_CH1(0);
-            CTRL_CH2(0);
-            CTRL_CH3(0);
-            CTRL_CH4(0);
-            CTRL_CH5(0);
-            CTRL_CH6(0);
+            CTRL_CH1(DUTY_NONE);
+            CTRL_CH2(DUTY_NONE);
+            CTRL_CH3(DUTY_NONE);
+            CTRL_CH4(DUTY_NONE);
+            CTRL_CH5(DUTY_NONE);
+            CTRL_CH6(DUTY_NONE);
 
             if (AssertTreatmentParams() == resp_ok)
             {
@@ -150,12 +153,12 @@ void TreatmentManager (void)
             break;
             
         case TREATMENT_STOPPING:
-            CTRL_CH1(0);
-            CTRL_CH2(0);
-            CTRL_CH3(0);
-            CTRL_CH4(0);
-            CTRL_CH5(0);
-            CTRL_CH6(0);
+            CTRL_CH1(DUTY_NONE);
+            CTRL_CH2(DUTY_NONE);
+            CTRL_CH3(DUTY_NONE);
+            CTRL_CH4(DUTY_NONE);
+            CTRL_CH5(DUTY_NONE);
+            CTRL_CH6(DUTY_NONE);
 
             timer_signals = 10;
             treatment_state = TREATMENT_STOPPING2;
@@ -277,10 +280,10 @@ resp_t SetPower (unsigned char ch, unsigned char a)
             signal_to_gen.ch4_power = a;
 
         if (ch == 5)
-            signal_to_gen.ch4_power = a;
+            signal_to_gen.ch5_power = a;
 
         if (ch == 6)
-            signal_to_gen.ch4_power = a;
+            signal_to_gen.ch6_power = a;
 
     }
 
@@ -325,8 +328,6 @@ void SendAllConf (void)
 //la llama el manager para generar las seniales CWAVE en los canales
 void GenerateSignalCWave (void)
 {
-    unsigned short dummy;
-    
     switch (cwave_state)
     {
         case INIT_CWAVE:
@@ -336,12 +337,12 @@ void GenerateSignalCWave (void)
 
         case UPDATE_POWER_CWAVE:
             //hago el update de la potencia cada 1 segundo
-            CTRL_CH1(signal_to_gen.ch1_power);
-            CTRL_CH2(signal_to_gen.ch2_power);
-            CTRL_CH3(signal_to_gen.ch3_power);
-            CTRL_CH4(signal_to_gen.ch4_power);
-            CTRL_CH5(signal_to_gen.ch4_power);
-            CTRL_CH6(signal_to_gen.ch4_power);
+            CTRL_CH1(CalcPowerOffset(signal_to_gen.ch1_power));
+            CTRL_CH2(CalcPowerOffset(signal_to_gen.ch2_power));
+            CTRL_CH3(CalcPowerOffset(signal_to_gen.ch3_power));
+            CTRL_CH4(CalcPowerOffset(signal_to_gen.ch4_power));
+            CTRL_CH5(CalcPowerOffset(signal_to_gen.ch5_power));
+            CTRL_CH6(CalcPowerOffset(signal_to_gen.ch6_power));
 
             cwave_state = GEN_CWAVE;
             timer_signals_gen = 1000;    //cada 1 seg reviso potencias de los lasers            
@@ -366,18 +367,16 @@ void GenerateSignalCWave (void)
 //dependen de la freq
 void GenerateSignalPulsed (void)
 {
-    unsigned short dummy;
-    
     switch (pulsed_state)
     {
         case INIT_PULSED:
 
-            CTRL_CH1(signal_to_gen.ch1_power);
-            CTRL_CH2(signal_to_gen.ch2_power);
-            CTRL_CH3(signal_to_gen.ch3_power);
-            CTRL_CH4(signal_to_gen.ch4_power);
-            CTRL_CH5(signal_to_gen.ch4_power);
-            CTRL_CH6(signal_to_gen.ch4_power);
+            CTRL_CH1(CalcPowerOffset(signal_to_gen.ch1_power));
+            CTRL_CH2(CalcPowerOffset(signal_to_gen.ch2_power));
+            CTRL_CH3(CalcPowerOffset(signal_to_gen.ch3_power));
+            CTRL_CH4(CalcPowerOffset(signal_to_gen.ch4_power));
+            CTRL_CH5(CalcPowerOffset(signal_to_gen.ch5_power));
+            CTRL_CH6(CalcPowerOffset(signal_to_gen.ch6_power));
             
             if (signal_to_gen.frequency == 0)
                 timer_signals_gen = 50;
@@ -390,12 +389,12 @@ void GenerateSignalPulsed (void)
         case GEN_PULSED:
             if (!timer_signals_gen)
             {
-                CTRL_CH1(0);
-                CTRL_CH2(0);
-                CTRL_CH3(0);
-                CTRL_CH4(0);
-                CTRL_CH5(0);
-                CTRL_CH6(0);
+                CTRL_CH1(DUTY_NONE);
+                CTRL_CH2(DUTY_NONE);
+                CTRL_CH3(DUTY_NONE);
+                CTRL_CH4(DUTY_NONE);
+                CTRL_CH5(DUTY_NONE);
+                CTRL_CH6(DUTY_NONE);
                 
                 if (signal_to_gen.frequency == 0)
                     timer_signals_gen = 50;
@@ -428,12 +427,12 @@ void GenerateSignalModulated (void)
     switch (modulated_state)
     {
         case INIT_MODULATED:
-            CTRL_CH1(0);
-            CTRL_CH2(0);
-            CTRL_CH3(0);
-            CTRL_CH4(0);
-            CTRL_CH5(0);
-            CTRL_CH6(0);
+            CTRL_CH1(DUTY_NONE);
+            CTRL_CH2(DUTY_NONE);
+            CTRL_CH3(DUTY_NONE);
+            CTRL_CH4(DUTY_NONE);
+            CTRL_CH5(DUTY_NONE);
+            CTRL_CH6(DUTY_NONE);
 
             modulated_index = 0;
             timer_signals_gen = 5;
@@ -455,7 +454,7 @@ void GenerateSignalModulated (void)
                     //Update Channels Power
                     dummy2 = signal_to_gen.ch1_power * dummy;
                     dummy2 >>= 8;
-                    CTRL_CH1(dummy2);
+                    CTRL_CH1(CalcPowerOffset(dummy2));
 
                     dummy2 = signal_to_gen.ch2_power * dummy;
                     dummy2 >>= 8;
@@ -463,19 +462,19 @@ void GenerateSignalModulated (void)
                     
                     dummy2 = signal_to_gen.ch3_power * dummy;
                     dummy2 >>= 8;
-                    CTRL_CH3(dummy2);
+                    CTRL_CH3(CalcPowerOffset(dummy2));
 
                     dummy2 = signal_to_gen.ch4_power * dummy;
                     dummy2 >>= 8;
-                    CTRL_CH4(dummy2);
+                    CTRL_CH4(CalcPowerOffset(dummy2));
 
                     dummy2 = signal_to_gen.ch5_power * dummy;
                     dummy2 >>= 8;
-                    CTRL_CH5(dummy2);
+                    CTRL_CH5(CalcPowerOffset(dummy2));
 
-                    dummy2 = signal_to_gen.ch5_power * dummy;
+                    dummy2 = signal_to_gen.ch6_power * dummy;
                     dummy2 >>= 8;
-                    CTRL_CH6(dummy2);
+                    CTRL_CH6(CalcPowerOffset(dummy2));
 
                     timer_signals_gen = 5;
                 }
@@ -493,5 +492,15 @@ void GenerateSignalModulated (void)
     }
 }
 
+unsigned short CalcPowerOffset(unsigned char p)
+{
+    unsigned short dummy = 0;
+    
+    dummy = p * 10;
+    if (dummy > DUTY_MAX)
+        dummy = DUTY_MAX;
+
+    return dummy;
+}
 
 //--- end of file ---//

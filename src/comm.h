@@ -10,6 +10,10 @@
 #ifndef _COMM_H_
 #define _COMM_H_
 
+
+//--- Defines For Configuration ---//
+#define CHF_ANSWER_FOR_ALL_CHANNELS
+
 //--- Exported types ---//
 //--- Exported constants ---//
 typedef enum {

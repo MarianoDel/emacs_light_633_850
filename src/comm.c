@@ -101,8 +101,7 @@ resp_t InterpretarMsg (void)
     unsigned char decimales = 0;
     char b [30];
 
-    //reviso canal propio o canal broadcast
-    //TODO: despues revisar esto y cargar directamente canal (si falta memoria)
+    //reviso si es un canal simple o canal broadcast
     if ((strncmp(pStr, s_ch1, sizeof(s_chf) - 1) == 0) ||
         (strncmp(pStr, s_ch2, sizeof(s_chf) - 1) == 0) ||
         (strncmp(pStr, s_ch3, sizeof(s_chf) - 1) == 0) ||
@@ -121,7 +120,7 @@ resp_t InterpretarMsg (void)
 
         pStr += sizeof(s_chf);	//normalizo al mensaje, hay un espacio
 
-        //-- Signal Setting
+        //-- Signal Setting - Same for all channels
         if (strncmp(pStr, s_set_signal, sizeof(s_set_signal) - 1) == 0)
         {
             pStr += sizeof(s_set_signal);		//normalizo al payload, hay un espacio
@@ -136,7 +135,7 @@ resp_t InterpretarMsg (void)
                 resp = resp_error;
         }
 
-        //-- Frequency Setting
+        //-- Frequency Setting - Same for all channels
         else if (strncmp(pStr, s_frequency, sizeof(s_frequency) - 1) == 0)
         {
             pStr += sizeof(s_frequency);		//normalizo al payload, hay un espacio
@@ -154,7 +153,7 @@ resp_t InterpretarMsg (void)
 
         }
 
-        //-- Power Setting for Leds
+        //-- Power Setting for Leds - Individual config
         else if (strncmp(pStr, s_power, sizeof(s_power) - 1) == 0)
         {
             pStr += sizeof(s_power);		//normalizo al payload, hay un espacio
@@ -363,6 +362,7 @@ resp_t InterpretarMsg (void)
 
     }	//fin if chx
 
+    // Answers for individuals
     if (ch != 0x0F)
     {
         if (resp == resp_ok)
@@ -371,6 +371,18 @@ resp_t InterpretarMsg (void)
         if (resp == resp_error)
             Usart1Send("NOK\n");
     }
+
+    // Answers for broadcastd
+#ifdef CHF_ANSWER_FOR_ALL_CHANNELS
+    if (ch == 0x0F)
+    {
+        if (resp == resp_ok)
+            Usart1Send("OK for all channels\n");
+
+        if (resp == resp_error)
+            Usart1Send("NOK for all channels\n");
+    }
+#endif
 
     return resp;
 }

@@ -1,5 +1,5 @@
 //---------------------------------------------------
-// #### PROYECTO LIGHT TREATMENT - Custom Board #####
+// #### PROJECT: LIGHT TREATMENT - Custom Board #####
 // ##
 // ## @Author: Med
 // ## @Editor: Emacs - ggtags
@@ -282,7 +282,18 @@ int main(void)
 
 
     //---------- END OF HARD TEST ----------//
-    //Activo el ADC con DMA
+
+    //---------- PRODUCTION PROGRAM ----------//
+    TIM_3_Init();
+    TIM_1_Init();
+    CTRL_CH1(DUTY_NONE);
+    CTRL_CH2(DUTY_NONE);
+    CTRL_CH3(DUTY_NONE);
+    CTRL_CH4(DUTY_NONE);
+    CTRL_CH5(DUTY_NONE);
+    CTRL_CH6(DUTY_NONE);
+
+    //Enable the ADC with DMA
     AdcConfig();
 
     //-- DMA configuration.
@@ -294,7 +305,7 @@ int main(void)
 
     USART1Config();
 
-    //--- Mensaje Bienvenida ---//
+    //--- Welcome Messages ---//
     //---- Defines from hard.h -----//
     Wait_ms(1000);
     Usart1Send("\nLight Treatment -- powered by: Kirno Technology\n");
@@ -321,7 +332,7 @@ int main(void)
     
     while (1)
     {        
-        // TreatmentManager();
+        TreatmentManager();
         UpdateCommunications();
         UpdateLed();
         UpdateBuzzer();
